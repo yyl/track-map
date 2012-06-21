@@ -1,6 +1,8 @@
-# Django settings for myheroku project.
+# Django settings for myheroku project.  
 import os
 from postgresify import postgresify
+##### please comment the following line if you don't use keys.py
+import keys
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -20,8 +22,9 @@ if bool(os.environ.get('LOCAL_DEV', False)):
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'djangodb',                      # Or path to database file if using sqlite3.
-        'USER': 'djangodb',                      # Not used with sqlite3.
-        'PASSWORD': '123',                  # Not used with sqlite3.
+	##### replace with your own user name and password
+        'USER': keys.MY_DB_USER,                      # Not used with sqlite3.  
+	'PASSWORD': keys.MY_DB_PASSWORD,                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }
@@ -70,13 +73,16 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
+# change into your own bucket link
 STATIC_URL = 'https://s3.amazonaws.com/heroku-django/'
 
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAJXYF4KB32T2RHF3A'
-AWS_SECRET_ACCESS_KEY = 'OWkax3TBlxPko2iWHKA8sbGtksHXuYvZ+/tkT1Yj'
+##### change into your own keys
+AWS_ACCESS_KEY_ID = keys.MY_AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = keys.MY_AWS_SECRET_ACCESS_KEY
+##### change into your own bucket name
 AWS_STORAGE_BUCKET_NAME = 'heroku-django'
 
 # Additional locations of static files
@@ -84,7 +90,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    # os.path.join(SITE_ROOT, 'static')
+    os.path.join(SITE_ROOT, '../static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -130,7 +136,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	os.path.join(SITE_ROOT, 'templates')
+	os.path.join(SITE_ROOT, '../templates')
 )
 
 INSTALLED_APPS = (
@@ -145,7 +151,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
     'gunicorn',
-    'storages'
+    'storages',
+    'blog',
 )
 
 # A sample logging configuration. The only tangible logging
