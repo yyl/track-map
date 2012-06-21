@@ -12,14 +12,24 @@
     </script>
     <script type="text/javascript">
       function initialize() {
+		var myLatlng = new google.maps.LatLng({{ points.0.latitude }}, {{ points.0.longitude }});
         var myOptions = {
-          center: new google.maps.LatLng({{ points.0.longitude }}, {{ points.0.latitude }}),
+          center: myLatlng,
           zoom: 8,
           mapTypeId: google.maps.MapTypeId.ROADMAP
         };
+
         var map = new google.maps.Map(document.getElementById("map_canvas"),
             myOptions);
-      }
+			
+		{% for point in points %}
+           var point = new google.maps.LatLng({{ point.latitude }}, {{ point.longitude }});
+               var marker = new google.maps.Marker({
+               position: point,
+               map: map,
+           });
+		{% endfor %}
+      }    
     </script>
   </head>
   <body onload="initialize()">
