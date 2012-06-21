@@ -152,7 +152,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'gunicorn',
     'storages',
-    'blog',
+    'tracksystem',
 )
 
 # A sample logging configuration. The only tangible logging
