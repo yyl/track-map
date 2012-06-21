@@ -3,18 +3,21 @@
 
 <html lang="en">
 
-<h2>Locations</h2>
+<body>
+	<h2>Locations</h2>
 
-<h3><a href="/map">On Map</a></h3>
+	<h3><a href="/map">On Map</a></h3>
 	
-{% if object_list %}
-	<ul>
-    {% for object in object_list %}
-        <li>{{object.time|date:"d/m/y"}}
-			({{object.latitude}}, {{object.longitude}})</li>
-    {% endfor %}
-    </ul>
-{% else %}
-	<p> Currently no location available. </p>
-{% endif %}
+	{% if object_list %}
+		<ul>
+	    {% for object in object_list %}
+	        <li>{{object.time|date:"d/m/y"}}
+				({{object.latitude}}, {{object.longitude}})</li>
+	    {% endfor %}
+	    </ul>
+	{% else %}
+		<p> Currently no location available. </p>
+	{% endif %}
+	
+</body>
 </html>
