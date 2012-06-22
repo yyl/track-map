@@ -43,7 +43,7 @@ def searchPlaces(latitude, longitude):
 	if categories != []:
 		query_result = GooglePlaces(YOUR_API_KEY).query(
 		        lat_lng={u'lat': latitude, u'lng': longitude}, 
-				types = mytype,
+				types = categories,
 				rankby='distance')
 	else:
 		result = [1,2,3]
