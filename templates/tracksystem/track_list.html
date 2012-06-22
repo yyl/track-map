@@ -28,11 +28,12 @@
         			center: myLatlng,
         			zoom: 15,
         			mapTypeId: google.maps.MapTypeId.ROADMAP
-      	};
+      		};
 
-      	var map = new google.maps.Map(document.getElementById("map_canvas"),
+      		var map = new google.maps.Map(document.getElementById("map_canvas"),
           					myOptions);
-
+			var pin = '{{STATIC_URL}}pictures/pin.png';
+			var circle = '{{STATIC_URL}}pictures/circle.png';
 			{% if object_list %}	
 				var myLatlng = new google.maps.LatLng(
 					{{ object_list.0.latitude }}, 
@@ -40,11 +41,33 @@
 				);
 				{% for object in object_list %}
          			var point = new google.maps.LatLng({{ object.latitude }}, {{ object.longitude }});
-             		var marker = new google.maps.Marker({
+             		var marker1 = new google.maps.Marker({
              			position: point,
              			map: map,
+						icon: circle
          			});
+					var place = new google.maps.LatLng({{ object.plat }}, {{ object.plon }});
+             		var marker2 = new google.maps.Marker({
+             			position: place,
+             			map: map,
+						icon: pin
+         			});
+
+
+				    var flightPlanCoordinates = [
+				        place,
+						point
+				    ];
+				    var flightPath = new google.maps.Polyline({
+				      path: flightPlanCoordinates,
+				      strokeColor: "#000000",
+				      strokeOpacity: 1.0,
+				      strokeWeight: 2
+				    });
+				   	flightPath.setMap(map);
+
 				{% endfor %}
+
 			{% endif %}
 			
 		
