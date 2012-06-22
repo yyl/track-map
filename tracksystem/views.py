@@ -22,6 +22,15 @@ def query(request):
 			).save()
 	else:
 		return redirect('/')
+
+def delete(request, id):
+	emp = Track.objects.get(pk = id)
+	emp.delete()
+	return redirect('/')
+
+def deleteall(request):
+	Track.objects.all().delete()
+	return redirect('/')
 	
 ## given coordinate, return the name, coordinate of the nearest place
 def searchPlaces(latitude, longitude):

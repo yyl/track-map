@@ -79,17 +79,22 @@
 	<nav>
 	<h2>Track Map</h2>
 	
+	<a href='delete_all'>Delete all</a>
+	
+	<div id='list'>
 	{% if object_list %}
 		<ul>
 	    {% for object in object_list %}
 	        <li>{{object.time|date:"d/m/y"}}
-				({{object.latitude}}, {{object.longitude}})</li>
+				({{object.latitude}}, {{object.longitude}}) 
+				<a href='delete/{{object.id}}'>Remove</a></li>
 	    {% endfor %}
 	    </ul>
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}
+	</div>
 	</nav>
-	<div id="map_canvas" style="width:100%; height:100%"></div>
+	<div id="map_canvas"></div>
 </body>
 </html>
