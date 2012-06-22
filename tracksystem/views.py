@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from annoying.decorators import render_to
 from googleplaces import GooglePlaces
 import re, os
+import urllib2, urllib
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -33,6 +34,22 @@ def delete(request, id):
 def deleteall(request):
 	Track.objects.all().delete()
 	return redirect('/')
+
+def posttest(request):
+	lat = request.POST['lat']
+	lon = request.POST['lon']
+	if lat and lon:
+		guess = searchPlaces(latitude_pass, longitude_pass)
+		Track(
+			time=datetime.now().isoformat(' '), 
+			latitude = lat,
+			longitude = lon,
+			place = guess[0],
+			plat = guess[1],
+			plon = guess[2]
+			).save()
+	else:
+		return redirect('/')
 	
 # def test(request):
 # 	guess = searchPlaces(40.5213555, -74.4562968)
