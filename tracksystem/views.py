@@ -11,7 +11,7 @@ def query(request):
 	latitude_pass = request.GET.get('lat', None)
 	longitude_pass = request.GET.get('long', None)	
 	if latitude_pass and longitude_pass:
-		guess = searchPlaces(latitude_pass, longitude_pass)
+		guess = searchPlaces(40.5213555, -74.4562968)
 		Track(
 			time=datetime.now().isoformat(' '), 
 			longitude = longitude_pass,
@@ -39,11 +39,14 @@ def searchPlaces(latitude, longitude):
 	for line in open('type.py','r'):
 		match = re.search(r"= '(\w+)'", line)
 		categories.append(match.group(1))
-		
-	query_result = GooglePlaces(YOUR_API_KEY).query(
+	
+	if categories != []:
+		query_result = GooglePlaces(YOUR_API_KEY).query(
 		        lat_lng={u'lat': latitude, u'lng': longitude}, 
 				types = mytype,
 				rankby='distance')
+	else:
+		result = [1,2,3]
 	result = []
 	result.append(query_result.places[0].name)
 	result.append(query_result.places[0].geo_location['lat'])
