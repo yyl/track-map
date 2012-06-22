@@ -16,9 +16,9 @@ def query(request):
 			time=datetime.now().isoformat(' '), 
 			longitude = longitude_pass,
 			latitude = latitude_pass,
-			place = guess[0],
-			plat = guess[1],
-			plon = guess[2]
+			# place = guess[0],
+			# plat = guess[1],
+			# plon = guess[2]
 			).save()
 	else:
 		return redirect('/')
