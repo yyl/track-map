@@ -153,6 +153,7 @@ INSTALLED_APPS = (
     'gunicorn',
     'storages',
     'tracksystem',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging

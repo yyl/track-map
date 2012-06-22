@@ -15,6 +15,7 @@ gunicorn==0.14.2
 kombu==2.1.8
 psycopg2==2.4.5
 python-dateutil==1.5
+python-google-places==0.8.0
 virtualenv==1.7.1.2
 virtualenv-clone==0.2.4
 virtualenvwrapper==3.5
