@@ -23,6 +23,7 @@ def query(request):
 			plat = guess[1],
 			plon = guess[2]
 			).save()
+		return HttpResponse('GET successful')
 	else:
 		return redirect('/')
 
@@ -35,22 +36,6 @@ def deleteall(request):
 	Track.objects.all().delete()
 	return redirect('/')
 
-def posttest(request):
-	lat = request.POST['lat']
-	lon = request.POST['lon']
-	if lat and lon:
-		guess = searchPlaces(latitude_pass, longitude_pass)
-		Track(
-			time=datetime.now().isoformat(' '), 
-			latitude = lat,
-			longitude = lon,
-			place = guess[0],
-			plat = guess[1],
-			plon = guess[2]
-			).save()
-	else:
-		return redirect('/')
-	
 # def test(request):
 # 	guess = searchPlaces(40.5213555, -74.4562968)
 # 	Track(
