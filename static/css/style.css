@@ -1,0 +1,10 @@
+header, nav, footer, article {display:block;} 
+
+body {
+    color: #333333;
+    font: 15px 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif;
+}
+
+nav {
+	float: left;
+}

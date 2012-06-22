@@ -74,7 +74,7 @@ STATIC_ROOT = ''
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
 # change into your own bucket link
-STATIC_URL = 'https://s3.amazonaws.com/heroku-django/'
+STATIC_URL = 'https://s3.amazonaws.com/heroku-trackmap/'
 
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
@@ -83,7 +83,7 @@ STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_ACCESS_KEY_ID = keys.MY_AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY = keys.MY_AWS_SECRET_ACCESS_KEY
 ##### change into your own bucket name
-AWS_STORAGE_BUCKET_NAME = 'heroku-django'
+AWS_STORAGE_BUCKET_NAME = 'heroku-trackmap'
 
 # Additional locations of static files
 STATICFILES_DIRS = (

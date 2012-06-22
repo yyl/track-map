@@ -22,12 +22,6 @@ def query(request):
 			).save()
 	else:
 		return redirect('/')
-
-@render_to('map.html')
-def map(request):
-	points = Track.objects.all()
-	# places = searchPlaces(points)
-	return {'points': points}
 	
 ## given coordinate, return the name, coordinate of the nearest place
 def searchPlaces(latitude, longitude):
