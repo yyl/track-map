@@ -12,7 +12,7 @@
 		<ul>
 	    {% for object in object_list %}
 	        <li>{{object.time|date:"d/m/y"}}
-				({{object.latitude}}, {{object.longitude}})</li>
+				({{object.latitude}}, {{object.longitude}}) - {{object.place}}</li>
 	    {% endfor %}
 	    </ul>
 	{% else %}
