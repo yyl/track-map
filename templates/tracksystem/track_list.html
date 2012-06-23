@@ -54,8 +54,8 @@
 
       		var map = new google.maps.Map(document.getElementById("map_canvas"),
           					myOptions);
-			var pin = '{{STATIC_URL}}img/pin.png';
-			var circle = '{{STATIC_URL}}img/circle.png';
+			var pin = '{{STATIC_URL}}tracksystem/img/pin.png';
+			var circle = '{{STATIC_URL}}tracksystem/img/circle.png';
 			{% if object_list %}	
 				var myLatlng = new google.maps.LatLng(
 					{{ object_list.0.latitude }}, 
