@@ -7,4 +7,12 @@ body {
 
 nav {
 	float: left;
+	padding: 20px;
+}
+
+#list ul li {
+    display: list-item;
+    list-style: none outside none;
+    margin: 1em 0;
+	margin-left:-40px;
 }

@@ -1,19 +1,41 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-
 <html lang="en">
-<head>
-  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/style.css"/>
-  <style type="text/css">
-    html { height: 100% }
-    body { height: 100%; margin: 0; padding: 0 }
-    #map_canvas { height: 100% }
-  </style>
-  <script type="text/javascript"
-    src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo&sensor=false">
-  </script>
-  <script type="text/javascript">
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap, from Twitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="{{ STATIC_URL }}tracksystem/css/bootstrap.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+    <link href="{{ STATIC_URL }}tracksystem/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="../assets/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
+	<!-- <style type="text/css">
+	    html { height: 100% }
+	    body { height: 100%; margin: 0; padding: 0 }
+/*		#map_canvas { height: 100% }*/
+	</style> -->
+	 <script type="text/javascript"
+	   src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo&sensor=false">
+	 </script>
+	 <script type="text/javascript">
     function initialize() {
 			{% if object_list %}	
 				var myLatlng = new google.maps.LatLng(
@@ -23,7 +45,7 @@
 			{% else %}
 					var myLatlng = new google.maps.LatLng(30.6636, 104.0667);
 			{% endif %}
-			
+
 			var myOptions = {
         			center: myLatlng,
         			zoom: 15,
@@ -32,8 +54,8 @@
 
       		var map = new google.maps.Map(document.getElementById("map_canvas"),
           					myOptions);
-			var pin = '{{STATIC_URL}}pictures/pin.png';
-			var circle = '{{STATIC_URL}}pictures/circle.png';
+			var pin = '{{STATIC_URL}}img/pin.png';
+			var circle = '{{STATIC_URL}}img/circle.png';
 			{% if object_list %}	
 				var myLatlng = new google.maps.LatLng(
 					{{ object_list.0.latitude }}, 
@@ -47,12 +69,21 @@
 						icon: circle
          			});
 					var place = new google.maps.LatLng({{ object.plat }}, {{ object.plon }});
-             		var marker2 = new google.maps.Marker({
+					var contentString = '<p>Guess you are here:<br> {{ object.place}}</p>'
+
+					var infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+
+					var marker2 = new google.maps.Marker({
              			position: place,
              			map: map,
 						icon: pin
          			});
 
+					google.maps.event.addListener(marker2, 'click', function() {
+					      infowindow.open(map, marker2);
+				    });
 
 				    var flightPlanCoordinates = [
 				        place,
@@ -69,32 +100,71 @@
 				{% endfor %}
 
 			{% endif %}
-			
-		
-    }    
-  </script>
-</head>
 
-<body onload="initialize()">
-	<nav>
-	<h2>Track Map</h2>
-	
-	<a href='delete_all'>Delete all</a>
-	
-	<div id='list'>
-	{% if object_list %}
-		<ul>
-	    {% for object in object_list %}
-	        <li>{{object.time|date:"d/m/y"}}
-				({{object.latitude}}, {{object.longitude}}) 
-				<a href='delete/{{object.id}}'>Remove</a></li>
-	    {% endfor %}
-	    </ul>
-	{% else %}
-		<p> Currently no location available. </p>
-	{% endif %}
-	</div>
-	</nav>
-	<div id="map_canvas"></div>
-</body>
+
+    }    
+  </script>  
+	 </script>
+  </head>
+
+  <body onload="initialize()">
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Track Map</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li class="active"><a href="#">App</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+		<div id="list" style='float:left;margin-right:20px;'>
+			<h3>Coordinates:</h3>
+			{% if object_list %}
+				<ul class="unstyled">
+			    {% for object in object_list %}
+			        <li>{{object.time|date:"m/y H:m"}}
+						( {{object.latitude}}, {{object.longitude}} ) 
+						<a href='delete/{{object.id}}'>Remove</a></li>
+			    {% endfor %}
+			    </ul>
+			{% else %}
+				<p> Currently no location available. </p>
+			{% endif %}
+			<button class='btn btn-inverse' href='delete_all'>Delete all</button>
+		</div>
+      	<div id="map_canvas" style="height:550px; width:600px;"></div>
+
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ STATIC_URL }}tracksystem/js/jquery.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-transition.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-alert.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-modal.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-dropdown.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-scrollspy.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-tab.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-tooltip.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-popover.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-button.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-collapse.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-carousel.js"></script>
+    <script src="{{ STATIC_URL }}tracksystem/js/bootstrap-typeahead.js"></script>
+
+  </body>
 </html>
