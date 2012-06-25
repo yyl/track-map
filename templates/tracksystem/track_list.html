@@ -96,7 +96,10 @@
 	    {% for object in object_list %}
 	        <li>{{object.time|date:"d/m/y"}}
 				({{object.latitude}}, {{object.longitude}}) 
-				<a href='delete/{{object.id}}'>Remove</a></li>
+				<a href='delete/{{object.id}}'>
+					<img src='{{STATIC_URL}}tracksystem/img/remove.jpeg' alt='Remove' 
+					width="13" height="13"/>
+				</a></li>
 	    {% endfor %}
 	    </ul>
 	{% else %}

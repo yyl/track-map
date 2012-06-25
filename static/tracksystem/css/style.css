@@ -10,6 +10,11 @@ nav {
 	padding: 20px;
 }
 
+#list ul {
+	overflow-y:scroll;
+	max-height: 400px;
+}
+
 #list ul li {
     display: list-item;
     list-style: none outside none;
