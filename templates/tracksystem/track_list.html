@@ -8,7 +8,7 @@
   <style type="text/css">
     html { height: 100% }
     body { height: 100%; margin: 0; padding: 0 }
-    #map_canvas { height: 100% }
+    #map_canvas { height: 100%; min-width:400px; min-height:400px; }
   </style>
   <script type="text/javascript"
     src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo&sensor=false">
@@ -87,14 +87,13 @@
 <body onload="initialize()">
 	<nav>
 	<h2>Track Map</h2>
-	
-	<a href='delete_all'>Delete all</a>
-	
+		
 	<div id='list'>
 	{% if object_list %}
 		<ul>
+		(Newest first)
 	    {% for object in object_list %}
-	        <li>{{object.time|date:"d/m/y"}}
+	        <li>{{object.time|date:"D. H: i"}}
 				({{object.latitude}}, {{object.longitude}}) 
 				<a href='delete/{{object.id}}'>
 					<img src='{{STATIC_URL}}tracksystem/img/remove.jpeg' alt='Remove' 
@@ -102,11 +101,12 @@
 				</a></li>
 	    {% endfor %}
 	    </ul>
+		<a href='delete_all'>Delete all</a>
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}
 	</div>
 	</nav>
-	<div id="map_canvas"></div>
+	<div id="map_canvas" ></div>
 </body>
 </html>

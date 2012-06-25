@@ -5,7 +5,7 @@ from tracksystem.models import Track
 admin.autodiscover()
 
 post_dict = {
-	'queryset': Track.objects.all().order_by('time'),
+	'queryset': Track.objects.all().order_by('-time'),
 }
 
 urlpatterns = patterns('',
