@@ -6,13 +6,19 @@ from annoying.decorators import render_to
 from googleplaces import GooglePlaces
 import re, os
 import urllib2, urllib
+from django.views.decorators.csrf import csrf_exempt
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
-# Create your views here.
+@csrf_exempt
 def query(request):
-	latitude_pass = request.GET.get('lat', None)
-	longitude_pass = request.GET.get('long', None)	
+	if request.method == 'POST':
+		latitude_pass = request.POST.get('lat', None)
+		longitude_pass = request.POST.get('long', None)	
+	else:
+		latitude_pass = request.GET.get('lat', None)
+		longitude_pass = request.GET.get('long', None)	
+		
 	if latitude_pass and longitude_pass:
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		Track(
