@@ -43,11 +43,11 @@
 				var path = [];
 				{% for object in object_list %}
          			var point = new google.maps.LatLng({{ object.latitude }}, {{ object.longitude }});
-             		var marker1 = new google.maps.Marker({
-             			position: point,
-             			map: map,
-						icon: circle
-         			});
+						//              		var marker1 = new google.maps.Marker({
+						//              			position: point,
+						//              			map: map,
+						// icon: circle
+						//          			});
 					var place = new google.maps.LatLng({{ object.plat }}, {{ object.plon }});
 					var marker2 = new google.maps.Marker({
              			position: place,
@@ -66,17 +66,17 @@
 					});
 					
 					path.push(point);
-				    var pair = [
-				        place,
-						point
-				    ];
-				    var flightPath = new google.maps.Polyline({
-				      path: pair,
-				      strokeColor: "#000000",
-				      strokeOpacity: 1.0,
-				      strokeWeight: 2
-				    });
-				   	flightPath.setMap(map);
+						// 				    var pair = [
+						// 				        place,
+						// point
+						// 				    ];
+						// 				    var flightPath = new google.maps.Polyline({
+						// 				      path: pair,
+						// 				      strokeColor: "#000000",
+						// 				      strokeOpacity: 1.0,
+						// 				      strokeWeight: 2
+						// 				    });
+						// 				   	flightPath.setMap(map);
 
 				{% endfor %}
 				
