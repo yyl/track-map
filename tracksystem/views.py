@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from models import Track
+from models import Track, Place
 from datetime import datetime
 from django.shortcuts import redirect
 from annoying.decorators import render_to
@@ -20,14 +20,17 @@ def query(request):
 		longitude_pass = request.GET.get('long', None)	
 		
 	if latitude_pass and longitude_pass:
+		# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
 		guess = searchPlaces(latitude_pass, longitude_pass)
+		if guess[0] not in Place.objects.all():
+			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2])
+			predict.save()
+		else:
+			predict = Place.objects.get(name=guess[0])
 		Track(
-			time=datetime.now().isoformat(' '), 
 			latitude = latitude_pass,
 			longitude = longitude_pass,
-			place = guess[0],
-			plat = guess[1],
-			plon = guess[2]
+			prediction=predict
 			).save()
 		return HttpResponse('GET successful')
 	else:

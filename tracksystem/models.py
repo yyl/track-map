@@ -1,10 +1,21 @@
 from django.db import models
 
 # Create your models here.
-class Track(models.Model):
-	time = models.DateTimeField('time')
+class Place(models.Model):
+	time = models.DateTimeField('time', auto_now=True)
+	name = models.CharField(max_length=100, default='N/A')
 	latitude = models.FloatField()
 	longitude = models.FloatField()
-	place = models.CharField(max_length=100, default='place')
-	plat = models.FloatField(default = 30.45)
-	plon = models.FloatField(default=104.6)
+	
+	def __unicode__(self):
+		return u"%s: (%f, %f)" % (self.name, self.latitude, self.longitude)
+	
+
+class Track(models.Model):
+	time = models.DateTimeField('time', auto_now=True)
+	latitude = models.FloatField()
+	longitude = models.FloatField()
+	prediction = models.ForeignKey(Place, default=1)
+	
+	def __unicode__(self):
+		return u"(%f, %f)" % (self.latitude, self.longitude)

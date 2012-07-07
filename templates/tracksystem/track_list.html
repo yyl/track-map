@@ -43,29 +43,36 @@
 				var path = [];
 				{% for object in object_list %}
          			var point = new google.maps.LatLng({{ object.latitude }}, {{ object.longitude }});
+					path.push(point);
 						//              		var marker1 = new google.maps.Marker({
 						//              			position: point,
 						//              			map: map,
 						// icon: circle
 						//          			});
-					var place = new google.maps.LatLng({{ object.plat }}, {{ object.plon }});
-					var marker2 = new google.maps.Marker({
-             			position: place,
-             			map: map,
-						icon: pin,
-						title: '<p>Guess you are here:<br> {{ object.place }}</p>'
-         			});
+					{% if object.get_previous_by_time %}
+						{% if object.prediction.name != object.get_previous_by_time.prediction.name %}
+							var place = new google.maps.LatLng(
+								{{ object.prediction.latitude }}, 
+								{{ object.prediction.longitude }}
+							);
+							var marker2 = new google.maps.Marker({
+		             			position: place,
+		             			map: map,
+								icon: pin,
+								title: '<p>Guess you are here!:<br> {{ object.prediction.name }}</p>'
+		         			});
 					
-					var contentString = 'Cannot guess.';
-					var infowindow = new google.maps.InfoWindow({
-						content: contentString
-					});
-					google.maps.event.addListener(marker2, 'click', function() {
-						infowindow.setContent(this.title);
-					    infowindow.open(map, this);
-					});
-					
-					path.push(point);
+							var contentString = 'Cannot guess.';
+							var infowindow = new google.maps.InfoWindow({
+								content: contentString
+							});
+							google.maps.event.addListener(marker2, 'click', function() {
+								infowindow.setContent(this.title);
+							    infowindow.open(map, this);
+							});
+						{% endif %}
+					{% endif %}
+
 						// 				    var pair = [
 						// 				        place,
 						// point
