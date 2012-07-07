@@ -49,8 +49,8 @@
 						//              			map: map,
 						// icon: circle
 						//          			});
-					{% if object.get_previous_by_time %}
-						{% if object.prediction.name != object.get_previous_by_time.prediction.name %}
+					{% if object.get_previous_by_time or 
+						object.prediction.name != object.get_previous_by_time.prediction.name %}
 							var place = new google.maps.LatLng(
 								{{ object.prediction.latitude }}, 
 								{{ object.prediction.longitude }}
