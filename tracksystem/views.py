@@ -1,15 +1,26 @@
 from django.http import HttpResponse
 from models import Track, Place
-from datetime import datetime
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render_to_response
 from annoying.decorators import render_to
 from googleplaces import GooglePlaces
 import re, os
 import urllib2, urllib
 from django.views.decorators.csrf import csrf_exempt
+from django import forms
+from django.template import RequestContext
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
+class UploadForm(forms.Form):
+	file = forms.FileField()
+
+def map(request):
+	return render_to_response(
+			'track_list.html', 
+			{'object_list': Track.objects.all()}, 
+			RequestContext(request)
+	)
+	
 @csrf_exempt
 def query(request):
 	if request.method == 'POST':
@@ -46,6 +57,45 @@ def deleteall(request):
 	Track.objects.all().delete()
 	return redirect('/')
 
+
+def upload(request):
+	if request.method == 'POST': # If the form has been submitted...
+		form = UploadForm(request.POST, request.FILES) # A form bound to the POST data
+		if form.is_valid(): # All validation rules pass
+			# Process the data in form.cleaned_data
+			# ...
+			output = handle_file_upload(request.FILES['file']) 
+			if output == True:
+				return redirect("/")
+			else:
+				return HttpResponse("""<p>Invalid file format; correct format:</p>
+										<p>2012-07-07 16:00, (40.5543564, -70.5787453), ...</p>
+										<a href='/upload'>Back to upload</a>""",  RequestContext(request))
+	else:
+		form = UploadForm() # An unbound form
+
+	return render_to_response('upload.html', {'form': form,}, RequestContext(request))
+
+		
+########################
+# helper method	
+########################
+
+# file format: 2012-07-07 16:00, (40.5543564, -70.5787453), ...
+def handle_file_upload(f):
+	output = False
+	for line in f.readlines():
+		matchtime = re.search(r'([-:\d\s])+,', line)
+		match1= re.search(r'\(([-\.\d]+),', line)
+		match2 = re.search(r', ([-\.\d]+)\),', line)
+		if match1 and match2 and matchtime:
+			time = datetime.strptime(matchtime, "%Y-%m-%d %H:%M")
+			longitude = float(match1.group(1))
+			latitude = float(match2.group(1))
+			Track(time=time, latitude=latitude, longitude=longitude).save()
+			output = True
+	return output
+	
 # def test(request):
 # 	guess = searchPlaces(40.5213555, -74.4562968)
 # 	Track(
@@ -81,5 +131,4 @@ def searchPlaces(latitude, longitude):
 	else:
 		result = [3,404,2]
 	return result
-				
-		
+

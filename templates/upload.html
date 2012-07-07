@@ -1,0 +1,10 @@
+<div id='form'>
+	<h1>Location file import</h1>
+	<p>File format: time stamp, latitude, longitude</p>
+	<form enctype="multipart/form-data" action="/upload" method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+	<input type="submit" value="Submit" />
+	</form>
+</div>
+<a href="/">Back</a>
