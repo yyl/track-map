@@ -22,7 +22,8 @@ def query(request):
 	if latitude_pass and longitude_pass:
 		# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
 		guess = searchPlaces(latitude_pass, longitude_pass)
-		if guess[0] not in Place.objects.all():
+		places = [obj.name for obj in Place.objects.all()]
+		if guess[0] not in places:
 			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2])
 			predict.save()
 		else:
