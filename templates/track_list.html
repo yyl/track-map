@@ -111,7 +111,8 @@
 		<ul>
 		(Newest first)
 	    {% for object in object_list %}
-	        <li>{{object.time|date:"D. H: i"}}
+			{% load tz %}
+	        <li>{{object.time|date:"D. H: i"|localtime}}
 				({{object.latitude}}, {{object.longitude}}) 
 				<a href='delete/{{object.id}}'>
 					<img src='{{STATIC_URL}}tracksystem/img/remove.jpeg' alt='Remove' 

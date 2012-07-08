@@ -1,11 +1,10 @@
 from django.http import HttpResponse
 from models import Track, Place
 from django.shortcuts import redirect, render_to_response
-from annoying.decorators import render_to
 from googleplaces import GooglePlaces
 import re, os
 from datetime import datetime
-import urllib2, urllib
+from dateutil import tz
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.template import RequestContext
@@ -16,9 +15,17 @@ class UploadForm(forms.Form):
 	file = forms.FileField()
 
 def map(request):
+	# from_zone = tz.tzutc()
+	# to_zone = tz.tzlocal()
+	# 
+	# utc_times = [obj.time.replace(tzinfo=from_zone) for obj.time in Track.objecs.all()]
+	# local_times = [time.astimezone(to_zone) for time in utc_times]
+	# 
+	# Convert time zone
+	central = utc.astimezone(to_zone)
 	return render_to_response(
 			'track_list.html', 
-			{'object_list': Track.objects.all()}, 
+			{'object_list': Track.objects.all(),}, 
 			RequestContext(request)
 	)
 	
@@ -36,7 +43,7 @@ def query(request):
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		places = [obj.name for obj in Place.objects.all()]
 		if guess[0] not in places:
-			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=datetime.now())
+			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=datetime.utcnow())
 			predict.save()
 		else:
 			predict = Place.objects.get(name=guess[0])
@@ -44,7 +51,7 @@ def query(request):
 			latitude = latitude_pass,
 			longitude = longitude_pass,
 			prediction=predict,
-			time=datetime.now()
+			time=datetime.utcnow()
 			).save()
 		return HttpResponse('GET successful')
 	else:
