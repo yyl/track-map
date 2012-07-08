@@ -99,7 +99,7 @@ def handle_file_upload(f):
 		match1= re.search(r'\(([-\.\d]+),', line)
 		match2 = re.search(r', ([-\.\d]+)\),', line)
 		if match1 and match2 and matchtime:
-			time = datetime.strptime(matchtime, "%Y-%m-%d %H:%M")
+			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d %H:%M")
 			longitude = float(match1.group(1))
 			latitude = float(match2.group(1))
 			Track(time=time, latitude=latitude, longitude=longitude).save()
