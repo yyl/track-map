@@ -95,7 +95,7 @@ def upload(request):
 def handle_file_upload(f):
 	output = False
 	for line in f.readlines():
-		matchtime = re.search(r'([-:\d\s])+,', line)
+		matchtime = re.search(r'([-:\d\s]+),', line)
 		match1= re.search(r'\(([-\.\d]+),', line)
 		match2 = re.search(r', ([-\.\d]+)\),', line)
 		if match1 and match2 and matchtime:
