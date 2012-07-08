@@ -22,7 +22,7 @@ def map(request):
 	# local_times = [time.astimezone(to_zone) for time in utc_times]
 	# 
 	# Convert time zone
-	central = utc.astimezone(to_zone)
+	# central = utc.astimezone(to_zone)
 	return render_to_response(
 			'track_list.html', 
 			{'object_list': Track.objects.all(),}, 
