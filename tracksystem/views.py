@@ -39,7 +39,7 @@ def query(request):
 		longitude_pass = request.GET.get('long', None)	
 		
 	if latitude_pass and longitude_pass:
-		now = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())
+		now = datetime.utcnow().replace(tzinfo=tz.tzutc())
 		# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		places = [obj.name for obj in Place.objects.all()]
