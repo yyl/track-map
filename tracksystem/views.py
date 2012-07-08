@@ -102,7 +102,20 @@ def handle_file_upload(f):
 			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d %H:%M")
 			longitude = float(match1.group(1))
 			latitude = float(match2.group(1))
-			Track(time=time, latitude=latitude, longitude=longitude).save()
+			# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
+			guess = searchPlaces(latitude, longitude)
+			places = [obj.name for obj in Place.objects.all()]
+			if guess[0] not in places:
+				predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=time)
+				predict.save()
+			else:
+				predict = Place.objects.get(name=guess[0])
+			Track(
+				latitude = latitude,
+				longitude = longitude,
+				prediction=predict,
+				time=time
+				).save()
 			output = True
 	return output
 	
