@@ -113,6 +113,7 @@
 		(Newest first)
 	    {% for object in object_list %}
 	        <li>
+				{{object.time|date:"D. H: i"}}
 				{% localtime on %}
 				    {{object.time|date:"D. H: i"}}
 				{% endlocaltime %}
