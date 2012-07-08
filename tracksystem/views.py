@@ -39,11 +39,12 @@ def query(request):
 		longitude_pass = request.GET.get('long', None)	
 		
 	if latitude_pass and longitude_pass:
+		now = datetime.datetime.utcnow().replace(tzinfo=tz.tzutc())
 		# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		places = [obj.name for obj in Place.objects.all()]
 		if guess[0] not in places:
-			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=datetime.utcnow())
+			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=now)
 			predict.save()
 		else:
 			predict = Place.objects.get(name=guess[0])
@@ -51,7 +52,7 @@ def query(request):
 			latitude = latitude_pass,
 			longitude = longitude_pass,
 			prediction=predict,
-			time=datetime.utcnow()
+			time=now
 			).save()
 		return HttpResponse('GET successful')
 	else:
