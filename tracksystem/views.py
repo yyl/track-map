@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render_to_response
 from annoying.decorators import render_to
 from googleplaces import GooglePlaces
 import re, os
+from datetime import datetime
 import urllib2, urllib
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
@@ -35,14 +36,15 @@ def query(request):
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		places = [obj.name for obj in Place.objects.all()]
 		if guess[0] not in places:
-			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2])
+			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=datetime.now())
 			predict.save()
 		else:
 			predict = Place.objects.get(name=guess[0])
 		Track(
 			latitude = latitude_pass,
 			longitude = longitude_pass,
-			prediction=predict
+			prediction=predict,
+			time=datetime.now()
 			).save()
 		return HttpResponse('GET successful')
 	else:

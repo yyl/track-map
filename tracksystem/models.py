@@ -3,7 +3,7 @@ from datetime import datetime
 
 # Create your models here.
 class Place(models.Model):
-	time = models.DateTimeField('time', default=datetime.now())
+	time = models.DateTimeField('time')
 	name = models.CharField(max_length=100, default='N/A')
 	latitude = models.FloatField()
 	longitude = models.FloatField()
@@ -13,7 +13,7 @@ class Place(models.Model):
 	
 
 class Track(models.Model):
-	time = models.DateTimeField('time', default=datetime.now())
+	time = models.DateTimeField('time')
 	latitude = models.FloatField()
 	longitude = models.FloatField()
 	prediction = models.ForeignKey(Place, default=1)
