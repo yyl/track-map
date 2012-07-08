@@ -120,6 +120,8 @@
 				{% localtime off %}
 				    {{object.time|date:"D. H: i"}}
 				{% endlocaltime %}
+				{{object.time|localtime|date:"D. H: i"}}				
+				{{object.time|utc|date:"D. H: i"}}
 				({{object.latitude}}, {{object.longitude}}) 
 				<a href='delete/{{object.id}}'>
 					<img src='{{STATIC_URL}}tracksystem/img/remove.jpeg' alt='Remove' 
