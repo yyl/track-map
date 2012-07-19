@@ -11,6 +11,7 @@ urlpatterns = patterns('',
 	url(r'^delete/(\d+)$', 'tracksystem.views.delete'),
 	url(r'^delete_all$', 'tracksystem.views.deleteall'),
 	url(r'^upload$', 'tracksystem.views.upload'),
+	url(r'^side', 'tracksystem.views.side'),
     # url(r'^myheroku/', include('myheroku.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

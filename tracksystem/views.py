@@ -93,6 +93,27 @@ def upload(request):
 
 	return render_to_response('upload.html', {'form': form,}, RequestContext(request))
 	
+# classify current places into 2 sides
+def side(request):	
+	even_side = []
+	odd_side = []
+	waiting = []
+	for place in Place.objects.all():
+		if place.streetNumber() == "N/A":
+			waiting.append(place)
+		elif int(place.streetNumber())%2 == 0:
+			even_side.append(place)
+		else:
+			odd_side.append(place)
+			
+	return render_to_response(
+				'track_list.html', 
+				{'object_list': Track.objects.all(),
+				'place_list': odd_side
+				}, 
+				RequestContext(request)
+			)
+			
 ########################
 # helper method	
 ########################
@@ -126,7 +147,7 @@ def googlePlaces(lat, lon):
 	qresult = GooglePlaces(YOUR_API_KEY).query(
 	        lat_lng={u'lat': lat, u'lng': lon}, 
 			types=TYPES,
-			radius=30)
+			radius=35)
 			
 	return qresult.places
 		
@@ -155,11 +176,13 @@ def placesOnPath(path):
 	for point in path:
 		pointplaces = googlePlaces(point[0], point[1])
 		for place in pointplaces:
-			if not existing(Place.objects.all(), place):
+			place.get_details()
+			if not existing(Place.objects.all(), place) and hasRoute(place):
 				now = datetime.utcnow().replace(tzinfo=tz.tzutc())
 				predict = Place(name=place.name, 
 								latitude=place.geo_location['lat'], 
 								longitude=place.geo_location['lng'], 
+								address=place.formatted_address,
 								time=now)
 				predict.save()	
 	
@@ -167,3 +190,12 @@ def placesOnPath(path):
 def existing(places, new):
 	names = [place.name for place in places]
 	return new.name in names
+	
+# return True if the place has a street address
+# place is the GooglePlace class in google places api
+def hasRoute(place):
+	for dic in place.details[u'address_components']:
+	      if dic[u'types'] == [u'route']:
+	        return True
+	else:
+		return False

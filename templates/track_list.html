@@ -146,10 +146,11 @@
 	    {% endfor %}
 	    </ul>
 		<a href='delete_all'>Delete all</a>
+		<a href='side'>One side</a>
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}
-	<!-- {% if place_list %}
+	{% if place_list %}
 	<ul>
 		{% for point in place_list %}
 			<li>
@@ -157,7 +158,7 @@
 			</li>
 		{% endfor %}
 	</ul>
-	{% endif %} -->
+	{% endif %}
 	</div>
 	</nav>
 	
