@@ -9,25 +9,30 @@ from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.template import RequestContext
 
+# preprocessing
+####################
+# current file path
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+# all possible types of places, read from type.py file
+TYPES = []
+for line in open(os.path.join(SITE_ROOT, 'type.py'),'r'):
+	match = re.search(r"= '(\w+)'", line)
+	TYPES.append(match.group(1))
+####################
 
 class UploadForm(forms.Form):
 	file = forms.FileField()
 
+# draw the map based on Track table
+# display tracks and nearby places
 def map(request):
-	# from_zone = tz.tzutc()
-	# to_zone = tz.tzlocal()
-	# 
-	# utc_times = [obj.time.replace(tzinfo=from_zone) for obj.time in Track.objecs.all()]
-	# local_times = [time.astimezone(to_zone) for time in utc_times]
-	# 
-	# Convert time zone
-	# central = utc.astimezone(to_zone)
 	return render_to_response(
-			'track_list.html', 
-			{'object_list': Track.objects.all(),}, 
-			RequestContext(request)
-	)
+				'track_list.html', 
+				{'object_list': Track.objects.all(),
+				'place_list': Place.objects.all()
+				}, 
+				RequestContext(request)
+			)
 	
 @csrf_exempt
 def query(request):
@@ -43,6 +48,7 @@ def query(request):
 		# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
 		guess = searchPlaces(latitude_pass, longitude_pass)
 		places = [obj.name for obj in Place.objects.all()]
+		# use it from db if already exist, otherwise create a new one
 		if guess[0] not in places:
 			predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=now)
 			predict.save()
@@ -65,6 +71,7 @@ def delete(request, id):
 
 def deleteall(request):
 	Track.objects.all().delete()
+	Place.objects.all().delete()	
 	return redirect('/')
 
 
@@ -85,69 +92,49 @@ def upload(request):
 		form = UploadForm() # An unbound form
 
 	return render_to_response('upload.html', {'form': form,}, RequestContext(request))
-
-		
+	
 ########################
 # helper method	
 ########################
 
+# extract time, loatitude, longitude info from the file and put them into database
 # file format: 2012-07-07 16:00, (40.5543564, -70.5787453), ...
 def handle_file_upload(f):
 	output = False
 	for line in f.readlines():
-		matchtime = re.search(r'([-:\d\s]+),', line)
-		match1= re.search(r'\(([-\.\d]+),', line)
-		match2 = re.search(r', ([-\.\d]+)\),', line)
+		matchtime = re.search(r'time: ([\d\s:-]+)', line)
+		match1= re.search(r'longitude: ([\d\s\.-]+)', line)
+		match2 = re.search(r'latitude: ([\d\s\.-]+)', line)
 		if match1 and match2 and matchtime:
-			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d %H:%M")
+			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
 			longitude = float(match1.group(1))
 			latitude = float(match2.group(1))
-			# guess[0] = place name, guess[1] = place lat, guess[2] = place longitude
-			guess = searchPlaces(latitude, longitude)
-			places = [obj.name for obj in Place.objects.all()]
-			if guess[0] not in places:
-				predict = Place(name=guess[0], latitude=guess[1], longitude=guess[2], time=time)
-				predict.save()
-			else:
-				predict = Place.objects.get(name=guess[0])
 			Track(
 				latitude = latitude,
 				longitude = longitude,
-				prediction=predict,
 				time=time
 				).save()
 			output = True
+	path = trackToPath()
+	if path != False:
+		placesOnPath(path)
 	return output
-	
-# def test(request):
-# 	guess = searchPlaces(40.5213555, -74.4562968)
-# 	Track(
-# 		time=datetime.now().isoformat(' '), 
-# 		latitude = 40.5213555,
-# 		longitude = -74.4562968,
-# 		place = guess[0],
-# 		plat = guess[1],
-# 		plon = guess[2]
-# 		).save()
-# 	return redirect('/')
+
+## given coordinates, do a google place search, return top 20 places matches the search
+def googlePlaces(lat, lon):
+	YOUR_API_KEY = 'AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo'
+	qresult = GooglePlaces(YOUR_API_KEY).query(
+	        lat_lng={u'lat': lat, u'lng': lon}, 
+			types=TYPES,
+			radius=30)
+			
+	return qresult.places
 		
 ## given coordinate, return the name, coordinate of the nearest place
 def searchPlaces(latitude, longitude):
-	YOUR_API_KEY = 'AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo'
-	categories = []
-	result = []
-	for line in open(os.path.join(SITE_ROOT, 'type.py'),'r'):
-		match = re.search(r"= '(\w+)'", line)
-		categories.append(match.group(1))
+	places = googlePlaces(latitude, longitude)
 	
-	if categories != []:
-		query_result = GooglePlaces(YOUR_API_KEY).query(
-		        lat_lng={u'lat': latitude, u'lng': longitude}, 
-				types = categories,
-				rankby='distance')
-	else:
-		result = [1,404,1]
-	if query_result.places != []:
+	if places != []:
 		result.append(query_result.places[0].name)
 		result.append(query_result.places[0].geo_location['lat'])
 		result.append(query_result.places[0].geo_location['lng'])
@@ -155,3 +142,28 @@ def searchPlaces(latitude, longitude):
 		result = [3,404,2]
 	return result
 
+# extract the path from the Track model
+def trackToPath():
+	if Track.objects.all() != []:
+		return [(track.latitude, track.longitude) for track in Track.objects.all()]	
+	else:
+		return False
+	
+# given a path, represented as a sequence of coordinates, search all nearby places 
+# path format: [(lat1, lon1), (lat2, lon2),....]
+def placesOnPath(path):
+	for point in path:
+		pointplaces = googlePlaces(point[0], point[1])
+		for place in pointplaces:
+			if not existing(Place.objects.all(), place):
+				now = datetime.utcnow().replace(tzinfo=tz.tzutc())
+				predict = Place(name=place.name, 
+								latitude=place.geo_location['lat'], 
+								longitude=place.geo_location['lng'], 
+								time=now)
+				predict.save()	
+	
+# check if a place is already in the place list
+def existing(places, new):
+	names = [place.name for place in places]
+	return new.name in names

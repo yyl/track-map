@@ -25,7 +25,7 @@ if bool(os.environ.get('LOCAL_DEV', False)):
 	##### replace with your own user name and password
         'USER': keys.MY_DB_USER,                      # Not used with sqlite3.  
 	'PASSWORD': keys.MY_DB_PASSWORD,                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '/tmp',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
         }
     }

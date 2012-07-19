@@ -50,28 +50,28 @@
 						//              			map: map,
 						// icon: circle
 						//          			});
-					{% if not object.get_previous_by_time or object.prediction.name != object.get_previous_by_time.prediction.name %}
-							var place = new google.maps.LatLng(
-								{{ object.prediction.latitude }}, 
-								{{ object.prediction.longitude }}
-							);
-							var marker2 = new google.maps.Marker({
-		             			position: place,
-		             			map: map,
-								icon: pin,
-								title: '<p>Guess you are here!:<br> {{ object.prediction.name }}</p>'
-		         			});
-					
-							var contentString = 'Cannot guess.';
-							var infowindow = new google.maps.InfoWindow({
-								content: contentString
-							});
-							google.maps.event.addListener(marker2, 'click', function() {
-								infowindow.setContent(this.title);
-							    infowindow.open(map, this);
-							});
-
-					{% endif %}
+					// {% if not object.get_previous_by_time or object.prediction.name != object.get_previous_by_time.prediction.name %}
+					// 		var place = new google.maps.LatLng(
+					// 			{{ object.prediction.latitude }}, 
+					// 			{{ object.prediction.longitude }}
+					// 		);
+					// 		var marker2 = new google.maps.Marker({
+					// 		             			position: place,
+					// 		             			map: map,
+					// 			icon: pin,
+					// 			title: '<p>Guess you are here!:<br> {{ object.prediction.name }}</p>'
+					// 		         			});
+					// 
+					// 		var contentString = 'Cannot guess.';
+					// 		var infowindow = new google.maps.InfoWindow({
+					// 			content: contentString
+					// 		});
+					// 		google.maps.event.addListener(marker2, 'click', function() {
+					// 			infowindow.setContent(this.title);
+					// 		    infowindow.open(map, this);
+					// 		});
+					// 
+					// {% endif %}
 
 						// 				    var pair = [
 						// 				        place,
@@ -94,7 +94,31 @@
 			      strokeWeight: 2
 			    });
 			   	Path.setMap(map);
+				
+			{% endif %}
 			
+			{% if place_list %}
+				{% for point in place_list %}
+					var place = new google.maps.LatLng(
+						{{ point.latitude }}, 
+						{{ point.longitude }}
+					);
+					var marker2 = new google.maps.Marker({
+			             			position: place,
+			             			map: map,
+									icon: pin,
+									title: '<p>Guess you are here!:<br> {{ point.name }}</p>'
+					});
+			
+					var contentString = 'Cannot guess.';
+					var infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					google.maps.event.addListener(marker2, 'click', function() {
+						infowindow.setContent(this.title);
+					    infowindow.open(map, this);
+					});
+				{% endfor %}
 			{% endif %}
 
     }    
@@ -125,6 +149,15 @@
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}
+	<!-- {% if place_list %}
+	<ul>
+		{% for point in place_list %}
+			<li>
+				{{point.name}}
+			</li>
+		{% endfor %}
+	</ul>
+	{% endif %} -->
 	</div>
 	</nav>
 	
