@@ -180,8 +180,11 @@
 	<h2>Track Map</h2>
 	
 	<a href="/upload">Import data file</a>
-	
+	<a href='delete_all'>Delete all</a>
+	<a href='side'>One side</a>
+	<a href='/'>Show all</a>
 	<div id='list'>
+	<h4>Points</h4>
 	{% if object_list %}
 		<ul>
 		(Newest first)
@@ -195,21 +198,35 @@
 				</a></li>
 	    {% endfor %}
 	    </ul>
-		<a href='delete_all'>Delete all</a>
-		<a href='side'>One side</a>
-		<a href='/'>Both sides</a>
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}
-	{% if place_list %}
+	
+	<h4>Places</h4>
 	<ul>
-		{% for point in place_list %}
-			<li>
-				{{point.name}}
-			</li>
-		{% endfor %}
+		{% if place_list %}
+			{% for point in place_list %}
+				<li>
+					{{point.name}}
+				</li>
+			{% endfor %}
+		{% endif %}
+		{% if evens %}
+			{% for point in evens %}
+				<li>
+					{{point.name}}
+				</li>
+			{% endfor %}
+		{% endif %}
+		{% if odds %}
+			{% for point in odds %}
+				<li>
+					{{point.name}}
+				</li>
+			{% endfor %}
+		{% endif %}
 	</ul>
-	{% endif %}
+	
 	</div>
 	</nav>
 	

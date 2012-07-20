@@ -29,7 +29,7 @@ def map(request):
 	even, odd, unknown = siding(Place.objects.all())
 	return render_to_response(
 				'track_list.html', 
-				{'object_list': Track.objects.all(),
+				{'object_list': Track.objects.order_by('-time'),
 				'place_list': unknown,
 				'evens': even,
 				'odds': odd
