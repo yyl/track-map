@@ -11,7 +11,7 @@ class Place(models.Model):
 	longitude = models.FloatField()
 	
 	def __unicode__(self):
-		return u"%s: (%f, %f)" % (self.name, self.latitude, self.longitude)
+		return u"%s: (%f, %f) [%s]" % (self.name, self.latitude, self.longitude, self.address)
 	
 	# return the street number of this place
 	def streetNumber(self):
