@@ -33,7 +33,9 @@
 
       		var map = new google.maps.Map(document.getElementById("map_canvas"),
           					myOptions);
-			var pin = '{{STATIC_URL}}tracksystem/img/pin.png';
+			var unknown = '{{STATIC_URL}}tracksystem/img/unknown.png';
+			var even = '{{STATIC_URL}}tracksystem/img/left.png';
+			var odd = '{{STATIC_URL}}tracksystem/img/right.png';
 			var circle = '{{STATIC_URL}}tracksystem/img/circle.png';
 			var markers = new Array()
 			{% if object_list %}	
@@ -106,7 +108,55 @@
 					var marker2 = new google.maps.Marker({
 			             			position: place,
 			             			map: map,
-									icon: pin,
+									icon: unknown,
+									title: '<p>Guess you are here!:<br> {{ point.name }}</p>'
+					});
+			
+					var contentString = 'Cannot guess.';
+					var infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					google.maps.event.addListener(marker2, 'click', function() {
+						infowindow.setContent(this.title);
+					    infowindow.open(map, this);
+					});
+				{% endfor %}
+			{% endif %}
+			
+			{% if evens %}
+				{% for point in evens %}
+					var place = new google.maps.LatLng(
+						{{ point.latitude }}, 
+						{{ point.longitude }}
+					);
+					var marker2 = new google.maps.Marker({
+			             			position: place,
+			             			map: map,
+									icon: even,
+									title: '<p>Guess you are here!:<br> {{ point.name }}</p>'
+					});
+			
+					var contentString = 'Cannot guess.';
+					var infowindow = new google.maps.InfoWindow({
+						content: contentString
+					});
+					google.maps.event.addListener(marker2, 'click', function() {
+						infowindow.setContent(this.title);
+					    infowindow.open(map, this);
+					});
+				{% endfor %}
+			{% endif %}
+			
+			{% if odds %}
+				{% for point in odds %}
+					var place = new google.maps.LatLng(
+						{{ point.latitude }}, 
+						{{ point.longitude }}
+					);
+					var marker2 = new google.maps.Marker({
+			             			position: place,
+			             			map: map,
+									icon: odd,
 									title: '<p>Guess you are here!:<br> {{ point.name }}</p>'
 					});
 			
@@ -147,6 +197,7 @@
 	    </ul>
 		<a href='delete_all'>Delete all</a>
 		<a href='side'>One side</a>
+		<a href='/'>Both sides</a>
 	{% else %}
 		<p> Currently no location available. </p>
 	{% endif %}

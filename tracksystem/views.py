@@ -26,10 +26,13 @@ class UploadForm(forms.Form):
 # draw the map based on Track table
 # display tracks and nearby places
 def map(request):
+	even, odd, unknown = siding(Place.objects.all())
 	return render_to_response(
 				'track_list.html', 
 				{'object_list': Track.objects.all(),
-				'place_list': Place.objects.all()
+				'place_list': unknown,
+				'evens': even,
+				'odds': odd
 				}, 
 				RequestContext(request)
 			)
@@ -95,17 +98,7 @@ def upload(request):
 	
 # classify current places into 2 sides
 def side(request):	
-	even_side = []
-	odd_side = []
-	waiting = []
-	for place in Place.objects.all():
-		if place.streetNumber() == "N/A":
-			waiting.append(place)
-		elif int(place.streetNumber())%2 == 0:
-			even_side.append(place)
-		else:
-			odd_side.append(place)
-			
+	even, odd, unknown = siding(Place.objects.all())
 	return render_to_response(
 				'track_list.html', 
 				{'object_list': Track.objects.all(),
@@ -144,12 +137,18 @@ def handle_file_upload(f):
 ## given coordinates, do a google place search, return top 20 places matches the search
 def googlePlaces(lat, lon):
 	YOUR_API_KEY = 'AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo'
-	qresult = GooglePlaces(YOUR_API_KEY).query(
+	try:
+		qresult = GooglePlaces(YOUR_API_KEY).query(
 	        lat_lng={u'lat': lat, u'lng': lon}, 
 			types=TYPES,
 			radius=35)
-			
-	return qresult.places
+		return qresult.places
+	except:
+		render_to_response(
+					'apierror.html', 
+					{}
+		)
+	
 		
 ## given coordinate, return the name, coordinate of the nearest place
 def searchPlaces(latitude, longitude):
@@ -189,7 +188,8 @@ def placesOnPath(path):
 # check if a place is already in the place list
 def existing(places, new):
 	names = [place.name for place in places]
-	return new.name in names
+	addresses = [place.address for place in places]
+	return new.name in names or new.formatted_address in addresses
 	
 # return True if the place has a street address
 # place is the GooglePlace class in google places api
@@ -199,3 +199,18 @@ def hasRoute(place):
 	        return True
 	else:
 		return False
+
+# slice places into thress categories: even, odd and unknown	
+def siding(places):
+	even_side = []
+	odd_side = []
+	waiting = []
+	for place in Place.objects.all():
+		if place.streetNumber() == "N/A":
+			waiting.append(place)
+		elif int(place.streetNumber())%2 == 0:
+			even_side.append(place)
+		else:
+			odd_side.append(place)
+			
+	return even_side, odd_side, waiting	
