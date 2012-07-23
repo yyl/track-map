@@ -7,6 +7,7 @@ class Place(models.Model):
 	time = models.DateTimeField('time')
 	name = models.CharField(max_length=100, default='N/A')
 	address = models.CharField(max_length=300, default='N/A', unique=True)
+	# types = models.CharField(max_length=500, default='N/A')
 	latitude = models.FloatField()
 	longitude = models.FloatField()
 	

@@ -74,7 +74,7 @@ def delete(request, id):
 
 def deleteall(request):
 	Track.objects.all().delete()
-	Place.objects.all().delete()	
+	# Place.objects.all().delete()	
 	return redirect('/')
 
 
@@ -119,7 +119,7 @@ def handle_file_upload(f):
 		matchtime = re.search(r'time: ([\d\s:-]+)', line)
 		match1= re.search(r'longitude: ([\d\s\.-]+)', line)
 		match2 = re.search(r'latitude: ([\d\s\.-]+)', line)
-		if match1 and match2 and matchtime:
+		if match1 and match2 and matchtime and farEnough(match2, match1, Track.objects.latest('time')):
 			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
 			longitude = float(match1.group(1))
 			latitude = float(match2.group(1))
@@ -134,6 +134,24 @@ def handle_file_upload(f):
 		placesOnPath(path)
 	return output
 
+# return True if the point (lat, lon) is 10+ meters away from the track point
+def farEnough(lat, lon, track):
+	degrees_to_radians = math.pi/180.0
+	
+	# phi = 90 - latitude
+	phi1 = (90.0 - lat)*degrees_to_radians
+	phi2 = (90.0 - float(track.latitude))*degrees_to_radians
+
+	# theta = longitude
+	theta1 = long1*degrees_to_radians
+	theta2 = float(track.longitude)*degrees_to_radians
+	
+	cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) + 
+	       math.cos(phi1)*math.cos(phi2))
+	arc = math.acos(cos)
+	
+	return arc*6371*1000 > 12
+	
 ## given coordinates, do a google place search, return top 20 places matches the search
 def googlePlaces(lat, lon):
 	YOUR_API_KEY = 'AIzaSyBN-X539yOgMPKaBMNAMZS2z8iZx0nD-zo'
@@ -148,24 +166,12 @@ def googlePlaces(lat, lon):
 					'apierror.html', 
 					{}
 		)
-	
-		
-## given coordinate, return the name, coordinate of the nearest place
-def searchPlaces(latitude, longitude):
-	places = googlePlaces(latitude, longitude)
-	
-	if places != []:
-		result.append(query_result.places[0].name)
-		result.append(query_result.places[0].geo_location['lat'])
-		result.append(query_result.places[0].geo_location['lng'])
-	else:
-		result = [3,404,2]
-	return result
 
 # extract the path from the Track model
+# only return points that are 15+ meters from the previous one
 def trackToPath():
 	if Track.objects.all() != []:
-		return [(track.latitude, track.longitude) for track in Track.objects.all()]	
+		return [(track.latitude, track.longitude) for track in Track.objects.all()]
 	else:
 		return False
 	
