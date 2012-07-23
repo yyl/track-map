@@ -6,11 +6,16 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
+from models import Track, Place
+from datetime import datetime
+from views import farEnough
 
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+class HelperTest(TestCase):
+	def setUp(self):
+		self.t1 = Track.objects.create(latitude=40.500379, longitude=-74.425107,
+					time=datetime.now())  
+		self.t2 = Track.objects.create(latitude=40.50039, longitude=-74.425024,
+					time=datetime.now())
+		
+	def test_far_enough(self):
+		self.assertTrue(farEnough(float(self.t1.latitude), float(self.t1.longitude), self.t2))

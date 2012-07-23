@@ -27,6 +27,8 @@ class Track(models.Model):
 	latitude = models.FloatField()
 	longitude = models.FloatField()
 	
-	
 	def __unicode__(self):
 		return u"(%f, %f)" % (self.latitude, self.longitude)
+
+	class Meta:
+		get_latest_by = "time"

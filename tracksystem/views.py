@@ -8,6 +8,7 @@ from dateutil import tz
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.template import RequestContext
+import math
 
 # preprocessing
 ####################
@@ -119,16 +120,19 @@ def handle_file_upload(f):
 		matchtime = re.search(r'time: ([\d\s:-]+)', line)
 		match1= re.search(r'longitude: ([\d\s\.-]+)', line)
 		match2 = re.search(r'latitude: ([\d\s\.-]+)', line)
-		if match1 and match2 and matchtime and farEnough(match2, match1, Track.objects.latest('time')):
-			time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
-			longitude = float(match1.group(1))
-			latitude = float(match2.group(1))
-			Track(
-				latitude = latitude,
-				longitude = longitude,
-				time=time
-				).save()
-			output = True
+		if match1 and match2 and matchtime:
+			lat = float(match2.group(1))
+			lon = float(match1.group(1))
+			if Track.objects.count() == 0 or farEnough(lat, lon, Track.objects.latest('time')):
+				time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
+				longitude = lat
+				latitude = lon
+				Track(
+					latitude = latitude,
+					longitude = longitude,
+					time=time
+					).save()
+				output = True
 	path = trackToPath()
 	if path != False:
 		placesOnPath(path)
@@ -143,14 +147,14 @@ def farEnough(lat, lon, track):
 	phi2 = (90.0 - float(track.latitude))*degrees_to_radians
 
 	# theta = longitude
-	theta1 = long1*degrees_to_radians
+	theta1 = lon*degrees_to_radians
 	theta2 = float(track.longitude)*degrees_to_radians
 	
 	cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) + 
 	       math.cos(phi1)*math.cos(phi2))
 	arc = math.acos(cos)
 	
-	return arc*6371*1000 > 12
+	return arc*6371*1000 > 15
 	
 ## given coordinates, do a google place search, return top 20 places matches the search
 def googlePlaces(lat, lon):
