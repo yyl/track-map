@@ -2,13 +2,12 @@ from django.http import HttpResponse
 from models import Track, Place
 from django.shortcuts import redirect, render_to_response
 from googleplaces import GooglePlaces
-import re, os
+import re, os, math
 from datetime import datetime
 from dateutil import tz
 from django.views.decorators.csrf import csrf_exempt
 from django import forms
 from django.template import RequestContext
-import math
 
 # preprocessing
 ####################
@@ -27,13 +26,14 @@ class UploadForm(forms.Form):
 # draw the map based on Track table
 # display tracks and nearby places
 def map(request):
-	even, odd, unknown = siding(Place.objects.all())
+	right = Place.objects.filter(right=True)
+	left = Place.objects.filter(right=False)
 	return render_to_response(
 				'track_list.html', 
 				{'object_list': Track.objects.order_by('-time'),
-				'place_list': unknown,
-				'evens': even,
-				'odds': odd
+				# 'place_list': unknown,
+				'evens': right,
+				'odds': left
 				}, 
 				RequestContext(request)
 			)
@@ -99,11 +99,11 @@ def upload(request):
 	
 # classify current places into 2 sides
 def side(request):	
-	even, odd, unknown = siding(Place.objects.all())
+	right = Place.objects.filter(right=True)
 	return render_to_response(
 				'track_list.html', 
 				{'object_list': Track.objects.all(),
-				'place_list': odd_side
+				'evens': right
 				}, 
 				RequestContext(request)
 			)
@@ -125,17 +125,16 @@ def handle_file_upload(f):
 			lon = float(match1.group(1))
 			if Track.objects.count() == 0 or farEnough(lat, lon, Track.objects.latest('time')):
 				time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
-				longitude = lat
-				latitude = lon
+				longitude = lon
+				latitude = lat
 				Track(
 					latitude = latitude,
 					longitude = longitude,
 					time=time
 					).save()
 				output = True
-	path = trackToPath()
-	if path != False:
-		placesOnPath(path)
+
+	placesOnPath(Track.objects.all())
 	return output
 
 # return True if the point (lat, lon) is 10+ meters away from the track point
@@ -170,20 +169,13 @@ def googlePlaces(lat, lon):
 					'apierror.html', 
 					{}
 		)
-
-# extract the path from the Track model
-# only return points that are 15+ meters from the previous one
-def trackToPath():
-	if Track.objects.all() != []:
-		return [(track.latitude, track.longitude) for track in Track.objects.all()]
-	else:
-		return False
 	
 # given a path, represented as a sequence of coordinates, search all nearby places 
 # path format: [(lat1, lon1), (lat2, lon2),....]
 def placesOnPath(path):
+	count = 0
 	for point in path:
-		pointplaces = googlePlaces(point[0], point[1])
+		pointplaces = googlePlaces(point.latitude, point.longitude)
 		for place in pointplaces:
 			place.get_details()
 			if not existing(Place.objects.all(), place) and hasRoute(place):
@@ -192,8 +184,14 @@ def placesOnPath(path):
 								latitude=place.geo_location['lat'], 
 								longitude=place.geo_location['lng'], 
 								address=place.formatted_address,
+								point=point,
 								time=now)
+				if count == 0:
+					predict.right = isRightSide(point, path[count+1], predict)
+				else:
+					predict.right = isRightSide(path[count-1], point, predict)
 				predict.save()	
+		count += 1
 	
 # check if a place is already in the place list
 def existing(places, new):
@@ -210,17 +208,12 @@ def hasRoute(place):
 	else:
 		return False
 
-# slice places into thress categories: even, odd and unknown	
-def siding(places):
-	even_side = []
-	odd_side = []
-	waiting = []
-	for place in Place.objects.all():
-		if place.streetNumber() == "N/A":
-			waiting.append(place)
-		elif int(place.streetNumber())%2 == 0:
-			even_side.append(place)
-		else:
-			odd_side.append(place)
-			
-	return even_side, odd_side, waiting	
+# return true if the place is on the right side of the road
+def isRightSide(point1, point2, place):
+	lat1 = point1.latitude
+	lon1 = point1.longitude
+	lat2 = point2.latitude
+	lon2 = point2.longitude
+	lat3 = place.latitude
+	lon3 = place.longitude	
+	return (lat2 - lat1) * (lon3 - lon1) - (lon2 - lon1) * (lat3 - lat1) > 0
