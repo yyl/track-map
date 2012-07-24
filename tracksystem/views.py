@@ -153,7 +153,7 @@ def farEnough(lat, lon, track):
 	       math.cos(phi1)*math.cos(phi2))
 	arc = math.acos(cos)
 	
-	return arc*6371*1000 > 15
+	return arc*6371*1000 > 23
 	
 ## given coordinates, do a google place search, return top 20 places matches the search
 def googlePlaces(lat, lon):
@@ -162,7 +162,7 @@ def googlePlaces(lat, lon):
 		qresult = GooglePlaces(YOUR_API_KEY).query(
 	        lat_lng={u'lat': lat, u'lng': lon}, 
 			types=TYPES,
-			radius=35)
+			radius=25)
 		return qresult.places
 	except:
 		render_to_response(
