@@ -45,8 +45,21 @@
 				);
 				var path = [];
 				{% for object in object_list %}
+					var cityCircle;
          			var point = new google.maps.LatLng({{ object.latitude }}, {{ object.longitude }});
 					path.push(point);
+					
+					var populationOptions = {
+					        strokeColor: "#FF0000",
+					        strokeOpacity: 0.6,
+					        strokeWeight: 2,
+					        fillColor: "#FF0000",
+					        fillOpacity: 0.35,
+					        map: map,
+					        center: point,
+					        radius: {{object.accu}}
+					      };
+					pointCircle = new google.maps.Circle(populationOptions);
 						//              		var marker1 = new google.maps.Marker({
 						//              			position: point,
 						//              			map: map,

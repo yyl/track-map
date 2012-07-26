@@ -107,7 +107,15 @@ def side(request):
 				}, 
 				RequestContext(request)
 			)
-			
+
+def deviation(request):
+	return render_to_response(
+				'deviation.html', 
+				{'object_list': Track.objects.order_by('-time'),
+				}, 
+				RequestContext(request)
+			)
+							
 ########################
 # helper method	
 ########################
@@ -120,9 +128,11 @@ def handle_file_upload(f):
 		matchtime = re.search(r'time: ([\d\s:-]+)', line)
 		match1= re.search(r'longitude: ([\d\s\.-]+)', line)
 		match2 = re.search(r'latitude: ([\d\s\.-]+)', line)
+		match3 = re.search(r'A:([\d.]+)', line)
 		if match1 and match2 and matchtime:
 			lat = float(match2.group(1))
 			lon = float(match1.group(1))
+			accu = float(match3.group(1))
 			if Track.objects.count() == 0 or distance(lat, lon, Track.objects.latest('time')) > 23:
 				time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
 				longitude = lon
@@ -130,6 +140,7 @@ def handle_file_upload(f):
 				Track(
 					latitude = latitude,
 					longitude = longitude,
+					accu = accu,
 					time=time
 					).save()
 				output = True

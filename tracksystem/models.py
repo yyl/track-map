@@ -7,9 +7,10 @@ class Track(models.Model):
 	time = models.DateTimeField('time')
 	latitude = models.FloatField()
 	longitude = models.FloatField()
+	accu = models.FloatField()
 	
 	def __unicode__(self):
-		return u"(%f, %f)" % (self.latitude, self.longitude)
+		return u"(%f, %f) - %f" % (self.latitude, self.longitude, self.accu)
 
 	class Meta:
 		get_latest_by = "time"
