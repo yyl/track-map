@@ -123,7 +123,7 @@ def handle_file_upload(f):
 		if match1 and match2 and matchtime:
 			lat = float(match2.group(1))
 			lon = float(match1.group(1))
-			if Track.objects.count() == 0 or farEnough(lat, lon, Track.objects.latest('time')) > 23:
+			if Track.objects.count() == 0 or distance(lat, lon, Track.objects.latest('time')) > 23:
 				time = datetime.strptime(matchtime.group(1), "%Y-%m-%d-%H-%M-%S")
 				longitude = lon
 				latitude = lat
@@ -138,7 +138,7 @@ def handle_file_upload(f):
 	return output
 
 # return True if the point (lat, lon) is 10+ meters away from the track point
-def farEnough(lat, lon, track):
+def distance(lat, lon, track):
 	degrees_to_radians = math.pi/180.0
 	
 	# phi = 90 - latitude
