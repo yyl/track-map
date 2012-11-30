@@ -173,7 +173,7 @@ def googlePlaces(lat, lon):
 		qresult = GooglePlaces(YOUR_API_KEY).query(
 	        lat_lng={u'lat': lat, u'lng': lon}, 
 			types=TYPES,
-			radius=25)
+			radius=40)
 		return qresult.places
 	except:
 		render_to_response(
